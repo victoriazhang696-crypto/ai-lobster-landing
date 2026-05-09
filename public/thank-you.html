@@ -12,10 +12,15 @@
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
 
-      gtag('config', 'AW-17997112641');
+      // 1. 先强行发送转化信号（插队发送，确保成功）
+      gtag('event', 'conversion', {
+          'send_to': 'AW-17997112641/gZMnCPzkmKkcEMHK2IVD',
+          'value': 1.0,
+          'currency': 'USD'
+      });
 
-      // 关键：进到这个页面即代表留资转化成功
-      gtag('event', 'conversion', {'send_to': 'AW-17997112641/gZMnCPzkmKkcEMHK2IVD'});
+      // 2. 再进行常规配置
+      gtag('config', 'AW-17997112641');
     </script>
     
     <style>
