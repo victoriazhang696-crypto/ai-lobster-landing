@@ -186,6 +186,59 @@ app.get('/api/reservations', async (req, res) => {
     }
 });
 
+// API: 记录 WhatsApp 点击
+app.post('/api/whatsapp-click', async (req, res) => {
+    const { timestamp } = req.body;
+
+    try {
+        // 保存到 Supabase
+        const { data, error } = await supabase
+            .from('whatsapp_clicks')
+            .insert([
+                {
+                    timestamp: timestamp || new Date().toISOString()
+                }
+            ]);
+
+        if (error) {
+            console.error('Supabase error:', error);
+            return res.json({ success: false, message: '记录失败' });
+        }
+
+        res.json({ success: true, message: '记录成功' });
+    } catch (error) {
+        console.error('Error:', error);
+        res.json({ success: false, message: '网络错误' });
+    }
+});
+
+// API: 获取 WhatsApp 点击记录（需要登录）
+app.get('/api/whatsapp-clicks', async (req, res) => {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+
+    if (!verifyToken(token)) {
+        return res.status(401).json({ success: false, message: '未授权' });
+    }
+
+    try {
+        // 从 Supabase 获取数据
+        const { data, error } = await supabase
+            .from('whatsapp_clicks')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Supabase error:', error);
+            return res.json({ success: false, message: '获取数据失败' });
+        }
+
+        res.json({ success: true, data: data || [] });
+    } catch (error) {
+        console.error('Error:', error);
+        res.json({ success: false, message: '网络错误' });
+    }
+});
+
 // 后台管理页面路由
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'admin.html'));

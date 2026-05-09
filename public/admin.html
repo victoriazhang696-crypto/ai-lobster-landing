@@ -202,6 +202,10 @@
                 <div class="number" id="weekCount">0</div>
                 <div class="label">本周预约</div>
             </div>
+            <div class="stat-card">
+                <div class="number" id="whatsappCount">0</div>
+                <div class="label">WhatsApp点击</div>
+            </div>
         </div>
 
         <div class="card">
@@ -235,10 +239,39 @@
                 </div>
             </div>
         </div>
+
+        <div class="card" style="margin-top: 30px;">
+            <div class="card-header">
+                <h2>WhatsApp 点击记录</h2>
+            </div>
+
+            <div class="table-container">
+                <div id="whatsappLoading" class="loading">
+                    <p>加载中...</p>
+                </div>
+
+                <table id="whatsappTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>序号</th>
+                            <th>点击时间</th>
+                        </tr>
+                    </thead>
+                    <tbody id="whatsappTableBody">
+                    </tbody>
+                </table>
+
+                <div id="whatsappEmptyState" class="empty-state" style="display: none;">
+                    <div class="icon">📭</div>
+                    <p>暂无 WhatsApp 点击记录</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
         let reservations = [];
+        let whatsappClicks = [];
 
         // 检查登录状态
         const token = localStorage.getItem('adminToken');
@@ -278,6 +311,29 @@
             }
         }
 
+        // 加载 WhatsApp 点击记录
+        async function loadWhatsAppClicks() {
+            try {
+                const response = await fetch('/api/whatsapp-clicks', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    whatsappClicks = result.data || [];
+                    renderWhatsAppTable();
+                    updateWhatsAppStats();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                document.getElementById('whatsappLoading').style.display = 'none';
+            }
+        }
+
         function renderTable() {
             const tableBody = document.getElementById('tableBody');
             const dataTable = document.getElementById('dataTable');
@@ -314,6 +370,32 @@
             document.getElementById('totalCount').textContent = reservations.length;
             document.getElementById('todayCount').textContent = todayCount;
             document.getElementById('weekCount').textContent = weekCount;
+        }
+
+        function renderWhatsAppTable() {
+            const tableBody = document.getElementById('whatsappTableBody');
+            const whatsappTable = document.getElementById('whatsappTable');
+            const emptyState = document.getElementById('whatsappEmptyState');
+
+            if (whatsappClicks.length === 0) {
+                emptyState.style.display = 'block';
+                whatsappTable.style.display = 'none';
+                return;
+            }
+
+            whatsappTable.style.display = 'table';
+            emptyState.style.display = 'none';
+
+            tableBody.innerHTML = whatsappClicks.map((item, index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${formatDate(item.timestamp)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function updateWhatsAppStats() {
+            document.getElementById('whatsappCount').textContent = whatsappClicks.length;
         }
 
         function formatDate(dateString) {
@@ -362,6 +444,7 @@
 
         // 页面加载时获取数据
         loadData();
+        loadWhatsAppClicks();
     </script>
 </body>
 </html>
