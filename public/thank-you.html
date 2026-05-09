@@ -11,12 +11,11 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
+
       gtag('config', 'AW-17997112641');
-      
-      // Google Ads 转化跟踪 - 留资成功
-      gtag('event', 'conversion', {
-          'send_to': 'AW-17997112641/gZMnCPzkmKkcEMHK2IVD'
-      });
+
+      // 关键：进到这个页面即代表留资转化成功
+      gtag('event', 'conversion', {'send_to': 'AW-17997112641/gZMnCPzkmKkcEMHK2IVD'});
     </script>
     
     <style>
