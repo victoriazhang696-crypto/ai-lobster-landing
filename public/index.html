@@ -681,24 +681,18 @@
 
         // WhatsApp 点击追踪
         document.querySelector('.whatsapp-float').addEventListener('click', function() {
-            // 使用 sendBeacon 确保在页面跳转时也能发送请求
+            // 使用 fetch 发送点击记录
             const data = {
                 timestamp: new Date().toISOString()
             };
             
-            if (navigator.sendBeacon) {
-                navigator.sendBeacon('/api/whatsapp-click', JSON.stringify(data));
-            } else {
-                // 如果不支持 sendBeacon，使用普通 fetch
-                fetch('/api/whatsapp-click', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data),
-                    keepalive: true
-                });
-            }
+            fetch('/api/whatsapp-click', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            }).catch(err => console.log('WhatsApp click tracking failed'));
         });
     </script>
 
