@@ -18,10 +18,20 @@
     <!-- Google Ads 转化跟踪触发函数 -->
     <script>
       function gtag_report_conversion(url) {
+        var callback = function () {
+          if (typeof(url) != 'undefined') {
+            window.location = url;
+          }
+        };
+        // 发送信号
         gtag('event', 'conversion', {
             'send_to': 'AW-17997112641/gZMnCPzkmKkcEMHK2IVD',
+            'event_callback': callback // 关键：等信号发送成功后再执行跳转
         });
-        if (url) { window.location = url; }
+        
+        // 给跳转加一个 300 毫秒的兜底延迟，防止 callback 没响应
+        setTimeout(callback, 300); 
+        
         return false;
       }
     </script>
