@@ -231,6 +231,52 @@
             margin-top: 5px;
         }
 
+
+        .phone-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .country-select {
+            width: 180px;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            background: #fff;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .country-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .phone-number-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .phone-number-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        @media (max-width: 500px) {
+            .phone-input-group {
+                flex-direction: column;
+            }
+
+            .country-select {
+                width: 100%;
+            }
+        }
+
         .submit-btn {
             width: 100%;
             padding: 15px;
@@ -472,7 +518,24 @@
             <form id="reservationForm">
                 <div class="form-group">
                     <label>电话 / WhatsApp <span class="required">*</span></label>
-                    <input type="tel" id="phone" placeholder="请输入您的电话或WhatsApp号码">
+                    <div class="phone-input-group">
+                        <select id="countryCode" class="country-select">
+                            <option value="+60" selected>🇲🇾 +60 (马来西亚)</option>
+                            <option value="+65">🇸🇬 +65 (新加坡)</option>
+                            <option value="+62">🇮🇩 +62 (印尼)</option>
+                            <option value="+66">🇹🇭 +66 (泰国)</option>
+                            <option value="+63">🇵🇭 +63 (菲律宾)</option>
+                            <option value="+84">🇻🇳 +84 (越南)</option>
+                            <option value="+86">🇨🇳 +86 (中国)</option>
+                            <option value="+852">🇭🇰 +852 (香港)</option>
+                            <option value="+886">🇹🇼 +886 (台湾)</option>
+                            <option value="+1">🇺🇸 +1 (美国)</option>
+                            <option value="+44">🇬🇧 +44 (英国)</option>
+                            <option value="+61">🇦🇺 +61 (澳大利亚)</option>
+                        </select>
+                        <input type="tel" id="phone" placeholder="请输入手机号码" class="phone-number-input">
+                    </div>
+                    <div class="form-hint" id="phoneHint">请输入有效的手机号码</div>
                 </div>
 
                 <div class="form-group">
@@ -589,18 +652,52 @@
 
         const form = document.getElementById('reservationForm');
         const phoneInput = document.getElementById('phone');
+        const countryCodeSelect = document.getElementById('countryCode');
         const emailInput = document.getElementById('email');
         const notesInput = document.getElementById('notes');
         const submitBtn = document.getElementById('submitBtn');
         const errorMessage = document.getElementById('errorMessage');
         const formSection = document.getElementById('formSection');
         const successMessage = document.getElementById('successMessage');
+        const phoneHint = document.getElementById('phoneHint');
+
+        // 国家代码对应的验证规则和提示
+        const phoneValidationRules = {
+            '+60': { pattern: /^[0-9]{9,10}$/, hint: '马来西亚手机号：9-10位数字（不含+60）', example: '123456789' },
+            '+65': { pattern: /^[0-9]{8}$/, hint: '新加坡手机号：8位数字（不含+65）', example: '91234567' },
+            '+62': { pattern: /^[0-9]{9,12}$/, hint: '印尼手机号：9-12位数字（不含+62）', example: '812345678' },
+            '+66': { pattern: /^[0-9]{9}$/, hint: '泰国手机号：9位数字（不含+66）', example: '812345678' },
+            '+63': { pattern: /^[0-9]{10}$/, hint: '菲律宾手机号：10位数字（不含+63）', example: '9171234567' },
+            '+84': { pattern: /^[0-9]{9,10}$/, hint: '越南手机号：9-10位数字（不含+84）', example: '912345678' },
+            '+86': { pattern: /^[0-9]{11}$/, hint: '中国手机号：11位数字（不含+86）', example: '13812345678' },
+            '+852': { pattern: /^[0-9]{8}$/, hint: '香港手机号：8位数字（不含+852）', example: '91234567' },
+            '+886': { pattern: /^[0-9]{9}$/, hint: '台湾手机号：9位数字（不含+886）', example: '912345678' },
+            '+1': { pattern: /^[0-9]{10}$/, hint: '美国手机号：10位数字（不含+1）', example: '2025551234' },
+            '+44': { pattern: /^[0-9]{10,11}$/, hint: '英国手机号：10-11位数字（不含+44）', example: '7123456789' },
+            '+61': { pattern: /^[0-9]{9}$/, hint: '澳大利亚手机号：9位数字（不含+61）', example: '412345678' }
+        };
+
+        // 更新提示文字
+        function updatePhoneHint() {
+            const countryCode = countryCodeSelect.value;
+            const rule = phoneValidationRules[countryCode];
+            if (rule) {
+                phoneHint.textContent = rule.hint;
+            }
+        }
+
+        // 监听国家代码变化
+        countryCodeSelect.addEventListener('change', updatePhoneHint);
+
+        // 初始化提示
+        updatePhoneHint();
 
         form.addEventListener('submit', async function(e) {
             e.preventDefault();
 
             // 验证至少填写一项联系方式
             const phone = phoneInput.value.trim();
+            const countryCode = countryCodeSelect.value;
             const email = emailInput.value.trim();
             const notes = notesInput.value.trim();
 
@@ -615,10 +712,13 @@
                 return;
             }
 
-            // 验证马来西亚电话号码格式（如果填写了）
-            if (phone && !isValidMalaysiaPhone(phone)) {
-                showError('请输入有效的马来西亚电话号码（如：0123456789 或 +60123456789）');
-                return;
+            // 验证电话号码格式（如果填写了）
+            if (phone) {
+                const rule = phoneValidationRules[countryCode];
+                if (rule && !rule.pattern.test(phone)) {
+                    showError('请输入有效的手机号码。' + rule.hint);
+                    return;
+                }
             }
 
             // 提交数据
@@ -633,7 +733,7 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        phone: phone,
+                        phone: countryCode + phone,
                         email: email,
                         notes: notes,
                         timestamp: new Date().toISOString()
@@ -664,19 +764,6 @@
         function isValidEmail(email) {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return emailRegex.test(email);
-        }
-
-        function isValidMalaysiaPhone(phone) {
-            // 移除所有空格和横杠
-            const cleanPhone = phone.replace(/[\s\-]/g, '');
-            
-            // 马来西亚手机号格式验证
-            // 格式1: 01XXXXXXXX (10-11位，以01开头)
-            // 格式2: +601XXXXXXXXX (国际格式)
-            // 格式3: 601XXXXXXXXX (不带+号的国际格式)
-            
-            const malaysiaPhoneRegex = /^(\+?6?01)[0-9]{7,9}$/;
-            return malaysiaPhoneRegex.test(cleanPhone);
         }
 
         // WhatsApp 点击追踪函数
