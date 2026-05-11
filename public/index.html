@@ -521,6 +521,7 @@
                     <div class="phone-input-group">
                         <select id="countryCode" class="country-select">
                             <option value="+60" selected>🇲🇾 +60 (马来西亚)</option>
+                            <option value="+673">🇧🇳 +673 (文莱)</option>
                             <option value="+65">🇸🇬 +65 (新加坡)</option>
                             <option value="+62">🇮🇩 +62 (印尼)</option>
                             <option value="+66">🇹🇭 +66 (泰国)</option>
@@ -664,6 +665,7 @@
         // 国家代码对应的验证规则和提示
         const phoneValidationRules = {
             '+60': { pattern: /^[0-9]{9,10}$/, hint: '马来西亚手机号：9-10位数字（不含+60）', example: '123456789' },
+            '+673': { pattern: /^[0-9]{7}$/, hint: '文莱手机号：7位数字（不含+673）', example: '1234567' },
             '+65': { pattern: /^[0-9]{8}$/, hint: '新加坡手机号：8位数字（不含+65）', example: '91234567' },
             '+62': { pattern: /^[0-9]{9,12}$/, hint: '印尼手机号：9-12位数字（不含+62）', example: '812345678' },
             '+66': { pattern: /^[0-9]{9}$/, hint: '泰国手机号：9位数字（不含+66）', example: '812345678' },
